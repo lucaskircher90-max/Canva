@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrossel 02 — O dark social | DZ Estúdio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@1,500;1,600&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    font-family:'Inter',sans-serif; background:#050503; color:#ECE3CE;
+    padding:48px 0 90px; min-height:100vh;
+  }
+  h1.pagehead{
+    text-align:center; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    color:#8a8578; margin-bottom:6px;
+  }
+  p.pagesub{ text-align:center; font-size:12px; color:#5c5850; margin-bottom:40px; }
+
+  #rail{
+    display:flex; gap:22px; overflow-x:auto; padding:0 calc(50vw - 190px) 24px;
+    scroll-snap-type:x mandatory;
+  }
+  #rail::-webkit-scrollbar{ height:6px; }
+  #rail::-webkit-scrollbar-thumb{ background:#333; border-radius:3px; }
+
+  /* ---------- card base ---------- */
+  .card{
+    flex:0 0 380px; width:380px; height:475px; scroll-snap-align:center;
+    border-radius:2px; position:relative; overflow:hidden;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:64px 32px 78px; box-shadow:0 20px 50px rgba(0,0,0,.55);
+    background:#0D3B2C; color:#ECE3CE;
+  }
+  .card.areia{ background:#ECE3CE; color:#12301F; }
+
+  /* halftone/grain treatment for impact slides */
+  .card.grain{ background:#0B2A20; }
+  .card.grain::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      radial-gradient(rgba(236,227,206,.16) 1px, transparent 1.3px),
+      radial-gradient(rgba(236,227,206,.10) 1px, transparent 1.3px);
+    background-size: 5px 5px, 3px 3px;
+    background-position: 0 0, 2px 2px;
+    mix-blend-mode:overlay; opacity:.55;
+  }
+  .card.grain::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(ellipse at 30% 20%, rgba(20,60,45,0) 0%, rgba(3,15,10,.75) 100%);
+  }
+  .card.grain.black{ background:#0A0A08; }
+  .card.grain.black::after{
+    background: radial-gradient(ellipse at 30% 20%, rgba(15,50,38,.25) 0%, rgba(2,4,3,.9) 100%);
+  }
+  .card > *{ position:relative; z-index:2; }
+
+  /* ---------- brand chrome (matches @dzestudio) ---------- */
+  .brandmark{
+    position:absolute; top:24px; left:26px; z-index:3;
+    width:30px; height:30px; border-radius:50%; border:1.3px solid currentColor;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Inter',sans-serif; font-weight:700; font-size:13px; opacity:.85;
+  }
+  .pagepill{
+    position:absolute; top:24px; right:26px; z-index:3;
+    border:1.3px solid currentColor; border-radius:20px; padding:4px 13px;
+    font-size:10.5px; font-weight:700; letter-spacing:.4px; opacity:.85;
+  }
+
+  .footer-sig{
+    position:absolute; left:0; right:0; bottom:22px; z-index:3;
+    display:flex; justify-content:space-between; padding:0 26px;
+    font-size:10px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; opacity:.65;
+  }
+  .dots{
+    position:absolute; left:0; right:0; bottom:52px; z-index:3;
+    display:flex; justify-content:center; gap:5px;
+  }
+  .dots span{ width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.3; }
+  .dots span.on{ opacity:1; }
+
+  /* ---------- kicker: the hand-drawn circled callout ---------- */
+  .kicker{ display:inline-flex; margin-bottom:16px; }
+  .kicker span{
+    border:1.3px solid #7FB39B; border-radius:50%/60%; padding:7px 20px;
+    font-size:12px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#9FD1B7;
+  }
+  .rule{ width:100%; max-width:290px; height:1px; background:currentColor; opacity:.35; margin:14px 0 16px; }
+
+  /* ---------- type ---------- */
+  .hd{
+    font-weight:800; text-transform:uppercase; line-height:1.1; letter-spacing:-.01em; text-wrap:balance;
+  }
+  .hd.xl{ font-size:38px; }
+  .hd.lg{ font-size:29px; }
+  .hd.md{ font-size:23px; }
+  .ax{ font-family:'Cormorant',serif; font-style:italic; font-weight:600; text-transform:none; }
+
+  .sub{ font-size:14.5px; line-height:1.55; margin-top:16px; opacity:.85; max-width:290px; }
+  .body-justify{ font-size:15px; line-height:1.6; text-align:justify; opacity:.92; max-width:300px; }
+
+  .bignum{ font-size:66px; font-weight:800; line-height:1; letter-spacing:-.02em; }
+  .bignum + .sub{ margin-top:12px; }
+  .src{ font-size:9.5px; letter-spacing:.3px; opacity:.55; text-transform:uppercase; margin-top:18px; display:block; }
+
+  .pairline{ font-size:17px; font-weight:800; text-transform:uppercase; line-height:1.35; }
+  .pairline.dim{ opacity:.45; margin-bottom:14px; }
+  .pairline.strong{ opacity:1; }
+
+  .steplist{ display:flex; flex-direction:column; gap:12px; margin-top:4px; }
+  .step{ font-size:14px; line-height:1.5; }
+  .step b{ font-weight:800; }
+
+  .ctabtn{
+    display:inline-block; margin-top:20px; border:1.3px solid currentColor; border-radius:30px;
+    padding:10px 20px; font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; width:fit-content;
+  }
+
+  #copyblock{
+    max-width:640px; margin:56px auto 0; background:#0F0F0B; border:1px solid #262419; border-radius:10px;
+    padding:32px 36px; font-size:14px; line-height:1.7; color:#D8D2C2;
+  }
+  #copyblock h2{ font-size:12px; text-transform:uppercase; letter-spacing:.6px; color:#8a8578; margin-bottom:14px; }
+  #copyblock p{ margin-bottom:16px; white-space:pre-line; }
+  #copyblock .tags{ color:#7fae95; font-size:13px; }
+  @media (max-width:760px){
+    #rail{ padding:0 calc(50vw - 165px); }
+    .card{ flex-basis:330px; width:330px; height:412px; padding:56px 26px 68px; }
+    .hd.xl{ font-size:31px; } .hd.lg{ font-size:25px; } .bignum{ font-size:54px; }
+    #copyblock{ margin-left:16px; margin-right:16px; padding:24px; }
+  }
+</style>
+</head>
+<body>
+
+<h1 class="pagehead">DZ Estúdio · O Novo Social — Conteúdo 02</h1>
+<p class="pagesub">Carrossel Instagram · identidade @dzestudio · arraste para navegar</p>
+
+<div id="rail">
+
+  <div class="card grain black">
+    <div class="brandmark">D</div>
+    <div class="pagepill">01/08</div>
+    <div class="hd xl">POSTAR TODO DIA PAROU DE SER ESTRATÉGIA.</div>
+    <p class="sub">Virou hábito. E hábito não é plano.</p>
+    <div class="dots"><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card areia">
+    <div class="brandmark">D</div>
+    <div class="pagepill">02/08</div>
+    <div class="hd lg">O FEED JÁ ESTÁ LOTADO DE CONTEÚDO PARECIDO.</div>
+    <p class="sub">Publicado por todo mundo, ao mesmo tempo, sem parar. Mais um post no meio disso não é estratégia — é só mais barulho.</p>
+    <div class="dots" style="color:#12301F;"><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="brandmark">D</div>
+    <div class="pagepill">03/08</div>
+    <div class="pairline dim">VALIA: FREQUÊNCIA DE PUBLICAÇÃO</div>
+    <div class="pairline strong">VALE AGORA: CONSISTÊNCIA DE TEMA E PROFUNDIDADE</div>
+    <div class="dots"><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card areia">
+    <div class="brandmark">D</div>
+    <div class="pagepill">04/08</div>
+    <div class="hd md">O QUE É "CONSISTÊNCIA DE TEMA", NA PRÁTICA?</div>
+    <p class="sub">Não é publicar menos por publicar menos. É toda peça carregar o mesmo fio condutor — pra quem te segue saber exatamente o que esperar de você.</p>
+    <div class="dots" style="color:#12301F;"><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="brandmark">D</div>
+    <div class="pagepill">05/08</div>
+    <div class="kicker"><span>o dado</span></div>
+    <div class="hd md" style="margin-top:.4rem;">CONTAS QUE PUBLICAM COM PROPOSTA SISTÊMICA RETÊM MAIS ATENÇÃO DO QUE AS QUE SÓ POSTAM MAIS.</div>
+    <p class="sub">Frequência alta sem consistência de tema reduz a satisfação do algoritmo com a conta. O que sustenta alcance é repetição de tema, não volume de posts.</p>
+    <span class="src">Socialinsider 2026 · HubSpot Trends 2025</span>
+    <div class="dots"><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card grain black">
+    <div class="brandmark">D</div>
+    <div class="pagepill">06/08</div>
+    <div class="hd lg">UMA PEÇA PENSADA, QUE CARREGA UM ARGUMENTO INTEIRO, VALE MAIS DO QUE CINCO POSTS SOLTOS.</div>
+    <p class="sub">Feitos só pra preencher espaço na grade.</p>
+    <div class="dots"><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card areia">
+    <div class="brandmark">D</div>
+    <div class="pagepill">07/08</div>
+    <div class="hd md">ANTES DE PREENCHER O PRÓXIMO ESPAÇO VAZIO DO CALENDÁRIO...</div>
+    <p class="sub">Pergunta: esse conteúdo merece existir? Ou ele só tá ali pra cumprir tabela?</p>
+    <div class="dots" style="color:#12301F;"><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card grain">
+    <div class="brandmark">D</div>
+    <div class="pagepill">08/08</div>
+    <div class="kicker"><span>o novo social · parte 2</span></div>
+    <div class="hd lg">SALVA ESSE CARROSSEL ANTES DE FECHAR O PRÓXIMO CALENDÁRIO.</div>
+    <p class="sub">Comenta: seu planejamento de conteúdo hoje é guiado por frequência, ou por consistência de tema?</p>
+    <div class="ctabtn">Salvar post</div>
+    <div class="dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+</div>
+
+<div id="copyblock">
+  <h2>Legenda sugerida</h2>
+  <p>Postar todo dia parou de ser estratégia. Virou hábito. 🗓️
+
+O feed já está lotado de conteúdo parecido — publicado por todo mundo, ao mesmo tempo, sem parar. Mais um post solto no meio disso não é estratégia, é só mais barulho.
+
+O que valia antes era frequência de publicação. O que vale agora é consistência de tema e profundidade: toda peça carregando o mesmo fio condutor, pra quem te segue saber exatamente o que esperar de você.
+
+Uma peça bem pensada, que carrega um argumento inteiro, vale mais do que cinco posts soltos feitos só pra preencher espaço na grade.
+
+Esse é o segundo post de uma série sobre pra onde as redes estão indo. Se perdeu o primeiro (sobre engajamento e formato), vale a pena rever. 🔖
+
+👉 Salva esse post e comenta: seu planejamento de conteúdo hoje é guiado por frequência, ou por consistência de tema?</p>
+  <h2>Hashtags sugeridas</h2>
+  <p class="tags">#marketingdigital #planejamentodeconteudo #redessociais #estrategiadeconteudo #socialmedia #calendareditorial #onovosocial</p>
+</div>
+
+</body>
+</html>
