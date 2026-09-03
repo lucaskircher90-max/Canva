@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrossel 01 — A curtida morreu | DZ Estúdio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@1,500;1,600&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    font-family:'Inter',sans-serif; background:#050503; color:#ECE3CE;
+    padding:48px 0 90px; min-height:100vh;
+  }
+  h1.pagehead{
+    text-align:center; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    color:#8a8578; margin-bottom:6px;
+  }
+  p.pagesub{ text-align:center; font-size:12px; color:#5c5850; margin-bottom:40px; }
+
+  #rail{
+    display:flex; gap:22px; overflow-x:auto; padding:0 calc(50vw - 190px) 24px;
+    scroll-snap-type:x mandatory;
+  }
+  #rail::-webkit-scrollbar{ height:6px; }
+  #rail::-webkit-scrollbar-thumb{ background:#333; border-radius:3px; }
+
+  /* ---------- card base ---------- */
+  .card{
+    flex:0 0 380px; width:380px; height:475px; scroll-snap-align:center;
+    border-radius:2px; position:relative; overflow:hidden;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:64px 32px 78px; box-shadow:0 20px 50px rgba(0,0,0,.55);
+    background:#0D3B2C; color:#ECE3CE;
+  }
+  .card.areia{ background:#ECE3CE; color:#12301F; }
+
+  /* halftone/grain treatment for impact slides */
+  .card.grain{ background:#0B2A20; }
+  .card.grain::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      radial-gradient(rgba(236,227,206,.16) 1px, transparent 1.3px),
+      radial-gradient(rgba(236,227,206,.10) 1px, transparent 1.3px);
+    background-size: 5px 5px, 3px 3px;
+    background-position: 0 0, 2px 2px;
+    mix-blend-mode:overlay; opacity:.55;
+  }
+  .card.grain::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(ellipse at 30% 20%, rgba(20,60,45,0) 0%, rgba(3,15,10,.75) 100%);
+  }
+  .card.grain.black{ background:#0A0A08; }
+  .card.grain.black::after{
+    background: radial-gradient(ellipse at 30% 20%, rgba(15,50,38,.25) 0%, rgba(2,4,3,.9) 100%);
+  }
+  .card > *{ position:relative; z-index:2; }
+
+  /* ---------- brand chrome (matches @dzestudio) ---------- */
+  .brandmark{
+    position:absolute; top:24px; left:26px; z-index:3;
+    width:30px; height:30px; border-radius:50%; border:1.3px solid currentColor;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Inter',sans-serif; font-weight:700; font-size:13px; opacity:.85;
+  }
+  .pagepill{
+    position:absolute; top:24px; right:26px; z-index:3;
+    border:1.3px solid currentColor; border-radius:20px; padding:4px 13px;
+    font-size:10.5px; font-weight:700; letter-spacing:.4px; opacity:.85;
+  }
+
+  .footer-sig{
+    position:absolute; left:0; right:0; bottom:22px; z-index:3;
+    display:flex; justify-content:space-between; padding:0 26px;
+    font-size:10px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; opacity:.65;
+  }
+  .dots{
+    position:absolute; left:0; right:0; bottom:52px; z-index:3;
+    display:flex; justify-content:center; gap:5px;
+  }
+  .dots span{ width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.3; }
+  .dots span.on{ opacity:1; }
+
+  /* ---------- kicker: the hand-drawn circled callout ---------- */
+  .kicker{ display:inline-flex; margin-bottom:16px; }
+  .kicker span{
+    border:1.3px solid #7FB39B; border-radius:50%/60%; padding:7px 20px;
+    font-size:12px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#9FD1B7;
+  }
+  .rule{ width:100%; max-width:290px; height:1px; background:currentColor; opacity:.35; margin:14px 0 16px; }
+
+  /* ---------- type ---------- */
+  .hd{
+    font-weight:800; text-transform:uppercase; line-height:1.1; letter-spacing:-.01em; text-wrap:balance;
+  }
+  .hd.xl{ font-size:38px; }
+  .hd.lg{ font-size:29px; }
+  .hd.md{ font-size:23px; }
+  .ax{ font-family:'Cormorant',serif; font-style:italic; font-weight:600; text-transform:none; }
+
+  .sub{ font-size:14.5px; line-height:1.55; margin-top:16px; opacity:.85; max-width:290px; }
+  .body-justify{ font-size:15px; line-height:1.6; text-align:justify; opacity:.92; max-width:300px; }
+
+  .bignum{ font-size:66px; font-weight:800; line-height:1; letter-spacing:-.02em; }
+  .bignum + .sub{ margin-top:12px; }
+  .src{ font-size:9.5px; letter-spacing:.3px; opacity:.55; text-transform:uppercase; margin-top:18px; display:block; }
+
+  .pairline{ font-size:17px; font-weight:800; text-transform:uppercase; line-height:1.35; }
+  .pairline.dim{ opacity:.45; margin-bottom:14px; }
+  .pairline.strong{ opacity:1; }
+
+  .steplist{ display:flex; flex-direction:column; gap:12px; margin-top:4px; }
+  .step{ font-size:14px; line-height:1.5; }
+  .step b{ font-weight:800; }
+
+  .ctabtn{
+    display:inline-block; margin-top:20px; border:1.3px solid currentColor; border-radius:30px;
+    padding:10px 20px; font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; width:fit-content;
+  }
+
+  #copyblock{
+    max-width:640px; margin:56px auto 0; background:#0F0F0B; border:1px solid #262419; border-radius:10px;
+    padding:32px 36px; font-size:14px; line-height:1.7; color:#D8D2C2;
+  }
+  #copyblock h2{ font-size:12px; text-transform:uppercase; letter-spacing:.6px; color:#8a8578; margin-bottom:14px; }
+  #copyblock p{ margin-bottom:16px; white-space:pre-line; }
+  #copyblock .tags{ color:#7fae95; font-size:13px; }
+  @media (max-width:760px){
+    #rail{ padding:0 calc(50vw - 165px); }
+    .card{ flex-basis:330px; width:330px; height:412px; padding:56px 26px 68px; }
+    .hd.xl{ font-size:31px; } .hd.lg{ font-size:25px; } .bignum{ font-size:54px; }
+    #copyblock{ margin-left:16px; margin-right:16px; padding:24px; }
+  }
+</style>
+</head>
+<body>
+
+<h1 class="pagehead">DZ Estúdio · O Novo Social — Conteúdo 01</h1>
+<p class="pagesub">Carrossel Instagram · identidade @dzestudio · arraste para navegar</p>
+
+<div id="rail">
+
+  <div class="card grain black">
+    <div class="brandmark">D</div>
+    <div class="pagepill">01/08</div>
+    <div class="hd xl">O ENGAJAMENTO CAIU.</div>
+    <p class="sub">E não, não é falta de conteúdo bom.</p>
+    <div class="dots"><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card areia">
+    <div class="brandmark">D</div>
+    <div class="pagepill">02/08</div>
+    <div class="hd lg">NÃO FOI A SUA CONTA QUE PIOROU.</div>
+    <p class="sub">Foi o critério que ficou mais duro pra todo mundo, ao mesmo tempo. O que era considerado bom engajamento há um ano, hoje é mediano.</p>
+    <div class="dots" style="color:#12301F;"><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="brandmark">D</div>
+    <div class="pagepill">03/08</div>
+    <div class="kicker"><span>o dado</span></div>
+    <div class="bignum">-24,1%</div>
+    <p class="sub">de queda no engajamento médio do Instagram em um ano. Menor patamar em 18 meses.</p>
+    <span class="src">Socialinsider, Instagram Benchmarks 2025</span>
+    <div class="dots"><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card areia">
+    <div class="brandmark">D</div>
+    <div class="pagepill">04/08</div>
+    <div class="hd md">O FORMATO QUE VOCÊ ESCOLHE MUDA O RESULTADO.</div>
+    <p class="sub">Cada formato ganha por um motivo diferente. Não existe "o formato certo" — existe o formato certo pro seu objetivo.</p>
+    <div class="dots" style="color:#12301F;"><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="brandmark">D</div>
+    <div class="pagepill">05/08</div>
+    <div class="steplist" style="margin-top:0.5rem;">
+      <div class="step"><b>Reels</b> → maior alcance em contas menores. É o formato que mais expõe perfis pequenos a público novo.</div>
+      <div class="step"><b>Carrossel</b> → líder em salvamentos. Sinal de que conteúdo educativo e passo a passo retém mais valor.</div>
+      <div class="step"><b>Imagem única</b> → menor desempenho geral. Ainda tem lugar, mas não como formato principal.</div>
+    </div>
+    <span class="src">Socialinsider, 2025</span>
+    <div class="dots"><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card grain black">
+    <div class="brandmark">D</div>
+    <div class="pagepill">06/08</div>
+    <div class="hd lg">SE O CONTEÚDO É BOM MAS NÃO PERFORMA, TALVEZ O PROBLEMA NÃO SEJA O CONTEÚDO.</div>
+    <p class="sub">É o formato certo, no objetivo errado.</p>
+    <div class="dots"><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card areia">
+    <div class="brandmark">D</div>
+    <div class="pagepill">07/08</div>
+    <div class="hd md">ANTES DE ESCOLHER O FORMATO, PERGUNTA O OBJETIVO.</div>
+    <p class="sub">Quer alcançar gente nova? Reels. Quer ser salvo e lembrado? Carrossel. Só depois disso decide o formato — nunca antes.</p>
+    <div class="dots" style="color:#12301F;"><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+  <div class="card grain">
+    <div class="brandmark">D</div>
+    <div class="pagepill">08/08</div>
+    <div class="kicker"><span>o novo social · parte 1</span></div>
+    <div class="hd lg">SALVA ESSE CARROSSEL ANTES DO PRÓXIMO PLANEJAMENTO DE PAUTA.</div>
+    <p class="sub">Comenta: seu calendário de conteúdo já leva em conta o objetivo de cada formato, ou só preenche a grade?</p>
+    <div class="ctabtn">Salvar post</div>
+    <div class="dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span></div>
+    <div class="footer-sig"><span>DIGITAL QUE</span><span>ROBÔ</span><span>NÃO FAZ.</span></div>
+  </div>
+
+</div>
+
+<div id="copyblock">
+  <h2>Legenda sugerida</h2>
+  <p>O engajamento caiu 24% no último ano. E não, não é falta de conteúdo bom. 📉
+
+A régua mudou pra todo mundo, ao mesmo tempo. O que era considerado uma boa taxa de engajamento há um ano hoje é mediano — não é sinal de que sua conta piorou.
+
+O que muda o jogo agora é escolher o formato certo pro objetivo certo: Reels pra alcançar gente nova, Carrossel pra ser salvo e lembrado, imagem única com uso mais pontual.
+
+Se o seu conteúdo é bom mas não performa, o problema pode não ser o conteúdo. Pode ser o formato certo, no objetivo errado.
+
+Esse é o primeiro de uma série sobre pra onde as redes sociais estão indo. Segue a gente pra não perder o resto. 🔖
+
+👉 Salva esse post e comenta: seu calendário de conteúdo já leva em conta o objetivo de cada formato?</p>
+  <h2>Hashtags sugeridas</h2>
+  <p class="tags">#marketingdigital #redessociais #estrategiadeconteudo #instagrammarketing #socialmedia #gestaoderedessociais #formatosderedessociais #onovosocial</p>
+</div>
+
+</body>
+</html>
